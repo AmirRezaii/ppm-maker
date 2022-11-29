@@ -1,6 +1,8 @@
 use std::io;
+use std::fs;
 use std::io::Write;
 use std::fs::File;
+use std::process::Command;
 
 // Write the pixels to a ppm file
 fn write_ppm(file: &mut File, pixels: &[u32], width: usize) -> io::Result<()> {
@@ -38,8 +40,8 @@ fn rect(pixels: &mut [u32], width: usize, x: usize, y: usize, w: usize, h: usize
 fn circle(pixels: &mut [u32], width: usize, x: usize, y: usize, r: usize, color: u32) {
     for _y in y-r..y+r {
         for _x in x-r..x+r {
-            let dx = (_x as i32 - x as i32);
-            let dy = (_y as i32 - y as i32);
+            let dx = _x as i32 - x as i32;
+            let dy = _y as i32 - y as i32;
             if dx*dx + dy*dy < (r*r) as i32 {
                 pixels[_y*width + _x] = color;
             }
@@ -78,4 +80,8 @@ fn main() {
     // Generate a File
     let mut f = File::create("output.ppm").unwrap();
     write_ppm(&mut f,&pixels,WIDTH).expect("writing to file failed");
+
+    let output = Command::new("convert").args(["output.ppm", "output.png"]).output();
+
+    fs::remove_file("output.ppm").expect("failed to remove ppm file");
 }
