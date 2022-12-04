@@ -49,6 +49,40 @@ fn circle(pixels: &mut [u32], width: usize, x: usize, y: usize, r: usize, color:
     }
 }
 
+fn checker(pixels: &mut [u32], width: usize, cols: usize, rows: usize) {
+    let height = pixels.len() / width;
+    let w = width/cols;
+    let h = height/rows;
+
+    let color1 = 0xFFFFFF;
+    let color2 = 0x202020;
+
+    for y in 0..rows {
+        for x in 0..cols {
+            if (x + y) % 2 == 0 {
+                rect(pixels, width, x*w, y*h, w, h, color1);
+            } else {
+                rect(pixels, width, x*w, y*h, w, h, color2);
+            }
+        }
+    }
+}
+
+fn dots(pixels: &mut [u32], width: usize, cols: usize, rows: usize) {
+    let height = pixels.len() / width;
+    let w = width/cols;
+    let h = height/rows;
+    let r = 30;
+
+    let color = 0x202020;
+
+    for y in 0..rows {
+        for x in 0..cols {
+            circle(pixels, width, x*w+r, y*h+r, r, color);
+        }
+    }
+}
+
 fn background(pixels: &mut [u32], color: u32) {
     pixels.fill(color);
 }
@@ -74,14 +108,12 @@ fn main() {
 
     background(&mut pixels, 0xFFFFFF);
 
-    uvgradient(&mut pixels, WIDTH);
-    circle(&mut pixels, WIDTH, WIDTH/2, HEIGHT/2, 70, rgb(255,255,0));
+    checker(&mut pixels, WIDTH, 8, 6);
 
     // Generate a File
     let mut f = File::create("output.ppm").unwrap();
     write_ppm(&mut f,&pixels,WIDTH).expect("writing to file failed");
 
-    let output = Command::new("convert").args(["output.ppm", "output.png"]).output();
-
+    let _output = Command::new("convert").args(["output.ppm", "output.png"]).output();
     fs::remove_file("output.ppm").expect("failed to remove ppm file");
 }
