@@ -49,6 +49,16 @@ fn circle(pixels: &mut [u32], width: usize, x: usize, y: usize, r: usize, color:
     }
 }
 
+fn line(pixels: &mut [u32], width: usize, x1: usize, y1: usize, x2: usize, y2: usize, color: u32) {
+    if x2 - x1 != 0 {
+        let m = (y2 as f32 - y1 as f32) / (x2 as f32 - x1 as f32);
+        for _x in x1..x2 {
+            let _y = m * _x as f32 - m * x1 as f32 + y1 as f32;
+            pixels[_y as usize * width + _x] = color;
+        }
+    }
+}
+
 fn checker(pixels: &mut [u32], width: usize, cols: usize, rows: usize) {
     let height = pixels.len() / width;
     let w = width/cols;
@@ -108,7 +118,12 @@ fn main() {
 
     background(&mut pixels, 0xFFFFFF);
 
-    checker(&mut pixels, WIDTH, 8, 6);
+    uvgradient(&mut pixels, WIDTH);
+    line(&mut pixels, WIDTH, 0, 0, WIDTH, HEIGHT, 0x000000);
+    line(&mut pixels, WIDTH, 0, HEIGHT-1, WIDTH-1, 0, 0x000000);
+    line(&mut pixels, WIDTH, 0, 0, 100, HEIGHT, 0x000000);
+    line(&mut pixels, WIDTH, 100, 0, 200, HEIGHT, 0x000000);
+    line(&mut pixels, WIDTH, 200, 0, 300, HEIGHT, 0x000000);
 
     // Generate a File
     let mut f = File::create("output.ppm").unwrap();
