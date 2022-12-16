@@ -50,11 +50,32 @@ fn circle(pixels: &mut [u32], width: usize, x: usize, y: usize, r: usize, color:
 }
 
 fn line(pixels: &mut [u32], width: usize, x1: usize, y1: usize, x2: usize, y2: usize, color: u32) {
+    let height: usize = pixels.len()/width;
+
+    let mut x1 = x1;
+    let mut x2 = x2;
+    let mut y1 = y1;
+    let mut y2 = y2;
+
+    if x2 < x1 {
+        swap(&mut x1, &mut x2);
+        swap(&mut y1, &mut y2);
+    }
+
     if x2 - x1 != 0 {
         let m = (y2 as f32 - y1 as f32) / (x2 as f32 - x1 as f32);
         for _x in x1..x2 {
-            let _y = m * _x as f32 - m * x1 as f32 + y1 as f32;
-            pixels[_y as usize * width + _x] = color;
+            if x1 >= 0 && x2 < height {
+                let dx = _x as f32 - x1 as f32;
+                let _y = (m*dx + y1 as f32 - 1.0) as i32;
+                let _ny = (m*(dx+1.0) + y1 as f32 - 1.0) as i32;
+
+                for y in _y.._ny {
+                    if y >= 0 && (y as usize) < height {
+                        pixels[y as usize * width + _x] = color;
+                    }
+                }
+            }
         }
     }
 }
@@ -108,6 +129,12 @@ fn hexa(h: u32) -> [u8; 3] {
     [r, g, b]
 }
 
+fn swap(a: &mut usize, b: &mut usize) {
+    let temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
 fn main() {
     // SCREEN SIZE CONSTANTS
     const WIDTH: usize = 800;
@@ -119,11 +146,7 @@ fn main() {
     background(&mut pixels, 0xFFFFFF);
 
     uvgradient(&mut pixels, WIDTH);
-    line(&mut pixels, WIDTH, 0, 0, WIDTH, HEIGHT, 0x000000);
-    line(&mut pixels, WIDTH, 0, HEIGHT-1, WIDTH-1, 0, 0x000000);
-    line(&mut pixels, WIDTH, 0, 0, 100, HEIGHT, 0x000000);
-    line(&mut pixels, WIDTH, 100, 0, 200, HEIGHT, 0x000000);
-    line(&mut pixels, WIDTH, 200, 0, 300, HEIGHT, 0x000000);
+    line(&mut pixels, WIDTH, WIDTH/2, HEIGHT/2, 0, 0, 0x000000);
 
     // Generate a File
     let mut f = File::create("output.ppm").unwrap();
