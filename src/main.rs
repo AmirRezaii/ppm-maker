@@ -65,12 +65,15 @@ fn line(pixels: &mut [u32], width: usize, x1: usize, y1: usize, x2: usize, y2: u
     if x2 - x1 != 0 {
         let m = (y2 as f32 - y1 as f32) / (x2 as f32 - x1 as f32);
         for _x in x1..x2 {
-            if x1 >= 0 && x2 < height {
+            if _x >= 0 && _x < width {
                 let dx = _x as f32 - x1 as f32;
-                let _y = (m*dx + y1 as f32 - 1.0) as i32;
-                let _ny = (m*(dx+1.0) + y1 as f32 - 1.0) as i32;
+                let mut _y = (m*dx + y1 as f32 - 1.0) as usize;
+                let mut _ny = (m*(dx+1.0) + y1 as f32 - 1.0) as usize;
 
-                for y in _y.._ny {
+                if _ny < _y {
+                    swap(&mut _y, &mut _ny);
+                }
+                for y in _y as i32.._ny as i32+1 {
                     if y >= 0 && (y as usize) < height {
                         pixels[y as usize * width + _x] = color;
                     }
@@ -146,7 +149,10 @@ fn main() {
     background(&mut pixels, 0xFFFFFF);
 
     uvgradient(&mut pixels, WIDTH);
-    line(&mut pixels, WIDTH, WIDTH/2, HEIGHT/2, 0, 0, 0x000000);
+    line(&mut pixels, WIDTH, WIDTH/4, HEIGHT/4, WIDTH*3/4, HEIGHT/4, 0xFFFFFF);
+    line(&mut pixels, WIDTH, WIDTH/4, HEIGHT/4, WIDTH/2, HEIGHT*3/4, 0xFFFFFF);
+    line(&mut pixels, WIDTH, WIDTH*3/4, HEIGHT/4, WIDTH/2, HEIGHT*3/4, 0xFFFFFF);
+    circle(&mut pixels, WIDTH, WIDTH/2, HEIGHT*3/7, 50, 0xFFFFFF);
 
     // Generate a File
     let mut f = File::create("output.ppm").unwrap();
