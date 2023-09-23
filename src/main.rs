@@ -20,7 +20,7 @@ fn uvgradient(pixels: &mut [u32], width: usize) {
     let height = pixels.len() / width;
     for y in 0..height {
         for x in 0..width {
-            let u = x as f32 / width as f32;
+           let u = x as f32 / width as f32;
             let v = y as f32 / height as f32;
             let _y = (u*255.0) as u8;
             let _x = (v*255.0) as u8;
@@ -65,7 +65,7 @@ fn line(pixels: &mut [u32], width: usize, x1: usize, y1: usize, x2: usize, y2: u
     if x2 - x1 != 0 {
         let m = (y2 as f32 - y1 as f32) / (x2 as f32 - x1 as f32);
         for _x in x1..x2 {
-            if _x >= 0 && _x < width {
+            if _x < width {
                 let dx = _x as f32 - x1 as f32;
                 let mut _y = (m*dx + y1 as f32 - 1.0) as usize;
                 let mut _ny = (m*(dx+1.0) + y1 as f32 - 1.0) as usize;
